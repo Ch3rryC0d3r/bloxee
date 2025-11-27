@@ -1,0 +1,157 @@
+1.  Add Player Customization (switch between different "characters", it saves when you exit the game) and Settings in Main Menu (settings will have a `Show Timer on Win` which is whether or not TODO#2 is shown) all settings will be saved
+
+2.  Add Timer label under `Moves` (in seconds, 2 decimals) on Win Menu
+
+3.  add `Quit` to Main Menu
+
+4.  add `Retry` to Win Menu and Pause Menu
+
+5.  add Worlds, which is a sub selection in Level Select, so there is like "World 1" which contains sub-levels and "World 2"
+
+6.  add toggle blocks (when the player moves [IF IT DID NOT HIT SOLID], it toggles the solidity, and changes the tileset
+    quad), like there's a toggle_on (which STARTS on, solid) and toggle_off block (with STARTS off, non-solid)
+
+7.  add on_box api function for block defs, called when, specifically, any BOX is on top of the tile.
+
+8.  add api function, "on_move", called when a player or box moves, even if it hit a solid, 
+    if users wanted  to check for an actual move (like it didn't hit a solid) they would do `object.hitSolid == false` in an if check
+
+    some function examples, or how i want it to work.
+    ```
+    on_move = function(object)
+        if object == "player"
+            if object.hitSolid == false then
+                -- whatever is inside here will trigger when the player moves and does not hit a solid.
+            end
+        end
+    end
+    ```
+    another example:
+    ```
+    on_move = function(object)
+        if object == "box"
+            if object.hitSolid == false then
+                -- whatever is inside here will trigger when a (any) box moves and does not hit a solid.
+            end
+        end
+    end
+    ```
+
+9. Add Portal Blocks. a portal will teleport to the nearest `out` portal if it exists (if there's multiple with the same distance, pick a random), if not, it wont teleport the object that went on the  `in` portal, if a box was transported first, and then a player comes in, the box will be pushed in a random (AVAILABLE) direction 1-block max, if there's no available directions for the box to be pushed, the player cannot be transported, vice-versa as well, in case, some-how, the box moves on it's own.
+
+[[ note, when i say `add api function` make sure to make it call it for all tiles unless explicitly said otherwise]]
+
+8. add api function, `load`, called for all tiles when the map starts.
+
+9. add api function `win`, called when map is won. I'm not quite sure what this would be used for, but it might be helpful
+
+10. add api function `badge_change(badge)`, so you start with Platinum when the map starts, so this isn't called unless you make enough moves to LOWER the badge, so like you keep moving, say 12% more than the plat moves thingy, so you'll get gold, this will be called, and then if you get silver (NOTE: this is in the middle of the round, not on win), it'll be called, and if you get bronze, it'll be called,
+example:
+```
+badge_change = function(badge)
+    if badge == 'platinum'
+        -- this cannot be called and will not be called ever, since you start with platinum.
+    end
+    -- the numbers like `25,30,etc.` is APPROXIMATED, idrk.
+    if badge == 'gold'
+        -- say, the level's platinum moves is 21, the amount to get gold is 22 (min), so if you move 1 move past 21 (and get 22). it'll call this and `badge` will be `'gold'`
+    end   
+    if badge == 'silver'
+        -- if you move 1 move past 25. it'll call this and `badge` will be `'silver'`
+    end    
+    if badge == 'bronze'
+        -- if you move 1 move past 30. it'll call this and `badge` will be `'bronze'`
+    end           
+end
+```
+
+11. allow for layers, if [level_name]_back.csv exists then draw it on the very back, if [level_name]_mid.csv exists, draw it in the middle, which is below boxes and players, but above floors. maybe giving each tile in config.lua a layer variable will help? idk, prolly not efficient.. especially if i have to do it for every new tile, maybe default it to 0 or something and only change it when it's necessary..? and if _back and/or _mid variants exist, the level has to be called [level_name]_front.csv for the normal/top layer, but in the level select it'll cut the `_front` part. right now the map adds a normal floor below the box, but instead don't do that, at all, and the back layer will be there instead now so you can change it to a colored floor tile! 
+
+12. add a way to add variables for blocks defs like:
+```
+blocks.example = {
+    config = { bool = false, dir = {0,1} },
+
+    badge_change = function(badge)
+        if badge == 'gold' and config.bool then
+            if BLOX.PLR.lastMoveDir == config.dir then
+                --stuff
+            end
+        end 
+    end
+}
+```
+
+10. add a way to make animated tiles, like this
+```
+blocks.example = {
+    anim = { -- if this table is defined, the tile draw-er will draw the tile "animated"
+        frames = {
+            {0,1}, -- first frame tileset pos
+            {0,2}, -- second frame tileset pos
+            -- and you can add more here --
+        },
+        speed = 0.1, -- the time to wait before going to the next frame
+    },
+    --[[
+    if you wanted a more complex frame speed, you can directly change the speed for each frame like this instead of the above:
+    anim = { 
+        frames = {
+            {0,1,0.1}, -- argument 1 = tileset pos.x, argument 2 = tileset pos.y, argument 3 = time to wait before going to the next frame
+            {0,2,0.2}, -- argument 1 = tileset pos.x, argument 2 = tileset pos.y, argument 3 = time to wait before going to the next frame
+        }
+    },    
+    ]]
+    load = function()
+        anim.play() -- starts the animation
+    end,
+    on_move = function(obj)
+        if obj == 'player' and obj.hitSolid == false then
+            anim.pause() -- stops the animation (until anim.play is called again) when the player moved (and didn't hit a solid)
+        end 
+    end
+}
+```
+
+11. Conveyer belt tiles, left, right, up & down (These are animated btw) it can push a box OR/AND a player in the direction it is (left/right/up/down), just 1 tile.
+
+12. dash block (left/up/down/right variants), moves a player or box 2 blocks in their direction, if you have something like:
+```
+Player, Dash-Right, Wall, Floor
+```
+moving right would bring you on top of the floor.
+
+13. cracked and hole blocks
+
+14. add [level_name].wires.csv layer (optional), so like i have wire tiles, i might add a button tile, and then you can connect the wire tiles to a door tile, and add an api function, `activate`, which is called upon wire activation, so there will be  a wire activation tile, which you just connect the wires from, on top of the button, to, the door, but instead of right on top of the door, you'll be placing an `activate` tile directly on top, for the wire tiles, there will be a bunch, like the cross, corners, straight directions, etc. and for wires add a thingy like:
+```blocks.wire_plus = {
+    wire = { 
+        top = true, -- whether or not (if it exists) a wire in this direction will be trigged, since this is a + shape, it's every direction.
+        bot = true, -- whether or not (if it exists) a wire in this direction will be trigged, since this is a + shape, it's every direction.
+        right = true, -- whether or not (if it exists) a wire in this direction will be trigged, since this is a + shape, it's every direction.
+        left = true -- whether or not (if it exists) a wire in this direction will be trigged, since this is a + shape, it's every direction.
+    }
+}
+```
+also `activate` api function example:
+```
+blocks.door = {
+    activate = function()
+        self.tile = 5 -- new thing btw it changes the tile in the map to that number, or maybe do something else, but just add a way to change the tile, also it actually changes it, not what it is drawn as, like it switches. 5 could be the opened door tile
+    end
+}
+```
+and this is just really neat bc you can chain wires and make the button actually open the door
+(wires aren't drawn btw)
+
+example:
+
+layer = front:
+Button,Floor,Floor,Door
+
+layer = wires:
+,Wire-R,Wire-R,trigger_activate
+so like the button checks for all neighbours 1 block away and then trigger every wire around it, and then those wires trigger
+    their VALID neighbours, like a corner (L) will only trigger the top and right one, bc wire = { top = true, bot = false, right = true, left = false }
+
+so when a box or a player is on top of the button, the wires will trigger the activate, and the door will open while the button is pressed, the button isn't permanent however, so you must leave a box on it to go through the door.
