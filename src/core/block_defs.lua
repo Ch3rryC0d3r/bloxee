@@ -65,8 +65,7 @@ blocks.only_right = {
 blocks.button = {
     solid = false,
     pos = {x=0, y=8},
-    on_col = function()
-        local map = BLOX.PLR.map
+    on_col = function(self, map)
         local x, y = BLOX.PLR.x, BLOX.PLR.y
         map:activateWiresAt(x, y)
     end
@@ -78,9 +77,7 @@ blocks.door_up = {
     boxSolid = true,
     tileset = "default",
     pos = {x=1, y=10},
-    activate = function(self)
-        -- change to door_left
-        local map = BLOX.PLR.map
+    activate = function(self, map)
         map.grid_front[self.y][self.x] = (0+(9*7))+1 
     end
 }
@@ -90,9 +87,7 @@ blocks.door_left = {
     boxSolid = false,
     tileset = "default",
     pos = {x=0, y=9},
-    activate = function(self)
-        -- change to door_up
-        local map = BLOX.PLR.map
+    activate = function(self, map)
         map.grid_front[self.y][self.x] = (1+(10*7))+1 
     end
 }
@@ -102,9 +97,7 @@ blocks.door_right = {
     boxSolid = true,
     tileset = "default",
     pos = {x=1, y=9},
-    activate = function(self)
-        -- change to door_down
-        local map = BLOX.PLR.map
+    activate = function(self, map)
         map.grid_front[self.y][self.x] = (0+(10*7))+1
     end
 }
@@ -114,9 +107,7 @@ blocks.door_down = {
     boxSolid = false,
     tileset = "default",
     pos = {x=0, y=10},
-    activate = function(self)
-        -- change to door_right
-        local map = BLOX.PLR.map
+    activate = function(self, map)
         map.grid_front[self.y][self.x] = (1+(9*7))+1
     end
 }
@@ -259,7 +250,7 @@ blocks.activate_trigger = {
             local tileBelow = map.grid_front[y][x]
             local tileDef = config.tiles[tileBelow]
             if tileDef and tileDef.activate then
-                tileDef.activate({x=x, y=y, map=map})
+                tileDef.activate(tileDef, map)
             end
         end
     end

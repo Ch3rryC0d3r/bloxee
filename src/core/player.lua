@@ -139,8 +139,9 @@ function player:move(dir, countMove)
     -- trigger tile logic
     local tileDef = config.tiles[self.map:getTileAt(self.x, self.y)]
     if tileDef and tileDef.on_col then
-        tileDef.on_col()
+        tileDef.on_col(tileDef, self.map)
     end
+
 end
 
 function player:keypressed(key)
@@ -251,8 +252,9 @@ function player:keypressed(key)
         -- trigger tile logic
         local tileDef = config.tiles[self.map:getTileAt(self.x, self.y)]
         if tileDef and tileDef.on_col then
-            tileDef.on_col()
+            tileDef.on_col(tileDef, self.map)
         end
+
 
         -- check win
         local allOnGoal = true
