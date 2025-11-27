@@ -65,6 +65,7 @@ blocks.only_right = {
 blocks.button = {
     solid = false,
     pos = {x=0, y=8},
+    csv_id = 57,
     on_col = function(self, map)
         local x, y = BLOX.PLR.x, BLOX.PLR.y
         map:activateWiresAt(x, y)
@@ -76,6 +77,7 @@ blocks.door_up = {
     solid = true,
     boxSolid = true,
     tileset = "default",
+    csv_id = 72,
     pos = {x=1, y=10},
     activate = function(self, map)
         map.grid_front[self.y][self.x] = (0+(9*7))+1 
@@ -87,6 +89,7 @@ blocks.door_left = {
     boxSolid = false,
     tileset = "default",
     pos = {x=0, y=9},
+    csv_id = 64,
     activate = function(self, map)
         map.grid_front[self.y][self.x] = (1+(10*7))+1 
     end
@@ -253,6 +256,19 @@ blocks.activate_trigger = {
                 tileDef.activate(tileDef, map)
             end
         end
+    end
+}
+
+blocks.collectible = {
+    solid = false,
+    tileset = "default",
+    pos = {x=6, y=0}, -- choose a free spot in your tileset
+    csv_id = 50,      -- make sure this isn't used yet
+    on_col = function()
+        BLOX.PLR.collectibles = (BLOX.PLR.collectibles or 0) + 1
+        -- remove the collectible from the map after grabbing
+        local x, y = BLOX.PLR.x, BLOX.PLR.y
+        BLOX.PLR.map.grid[y][x] = 7 -- default floor
     end
 }
 

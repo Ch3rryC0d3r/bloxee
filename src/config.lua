@@ -66,8 +66,8 @@ config.badges = {
 
 -- UI SETTINGS
 config.ui = {
-    screenWidth = 640,
-    screenHeight = 480,
+    screenWidth = 850,
+    screenHeight = 450,
     tileSize = 32,
     fonts = {
         title = 48,

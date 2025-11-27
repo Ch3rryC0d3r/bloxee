@@ -38,12 +38,6 @@ function updateTimers(dt)
     end
 end
 
-local function tilesetQuad(tx, ty)
-    local x = tx
-    local y = ty
-    local cols = player.map.tileset:getWidth()/TILE_SIZE
-    return player.map.quads[ty*cols + tx + 1]
-end
 
 function player:load(map, level)
     self.map = map
@@ -57,7 +51,8 @@ function player:load(map, level)
     self.boxesToMove = {}
     self.solidCol = false
     
-    self.tilesetQuad = tilesetQuad(0,2)
+    local cols = self.map.tileset:getWidth()/TILE_SIZE
+    self.tilesetQuad = self.map.quads[2*cols + 0 + 1]
 
     if map.playerSpawn then
         self.x = map.playerSpawn.x
@@ -104,11 +99,12 @@ function player:move(dir, countMove)
     local targetX, targetY = self.x + dx, self.y + dy
 
     -- bounds check
-    if not self.map:getTileAt(targetX, targetY) then
+    if not self.map.grid[targetY] or not self.map.grid[targetY][targetX] then
         self.hitSolid = true
         return
     end
 
+    local targetTile = self.map.grid[targetY][targetX]
     if not self.map:isEmpty(targetX, targetY, {dx, dy}, true) then
         self.hitSolid = true
         return
@@ -124,6 +120,7 @@ function player:move(dir, countMove)
     end
 
     if boxAtTarget then
+        -- tell map to slide the box
         self.map:moveBox(boxAtTarget, dir)
         if boxAtTarget.hitSolid then
             self.hitSolid = true
@@ -137,11 +134,10 @@ function player:move(dir, countMove)
     if countMove then self.moves = self.moves + 1 end
 
     -- trigger tile logic
-    local tileDef = config.tiles[self.map:getTileAt(self.x, self.y)]
+    local tileDef = config.tiles[self.map.grid[self.y][self.x]]
     if tileDef and tileDef.on_col then
-        tileDef.on_col(tileDef, self.map)
+        tileDef.on_col()
     end
-
 end
 
 function player:keypressed(key)
@@ -153,21 +149,12 @@ function player:keypressed(key)
     elseif key == "left" then dx = -1
     elseif key == "right" then dx = 1
     else return end
-    if dx > 0 then 
-        self.tilesetQuad = tilesetQuad(3,0)
-    elseif dx < 0 then
-        self.tilesetQuad = tilesetQuad(3,1)
-    elseif dy > 0 then
-        self.tilesetQuad = tilesetQuad(0,2)
-    elseif dy < 0 then
-        self.tilesetQuad = tilesetQuad(3,2)
-    end    
 
     self.lastMoveDir = {dx, dy}
     local targetX, targetY = self.x + dx, self.y + dy
 
     -- check bounds
-    if not self.map:getTileAt(targetX, targetY) then return end
+    if not self.map.grid[targetY] or not self.map.grid[targetY][targetX] then return end
 
     -- find box at target
     local boxAtTarget
@@ -181,67 +168,74 @@ function player:keypressed(key)
     local moved = false
         
     if not boxAtTarget then
-        -- normal move
+        -- normal move: player ignores boxSolid, only solid blocks matter
+        local tile = self.map.grid[targetY][targetX]
         if self.map:isEmpty(targetX, targetY, {dx, dy}, true) then
             self.x = targetX
             self.y = targetY
             moved = true
         end
 
-    else      
+    else
         -- push attempt
         local pushX, pushY = targetX + dx, targetY + dy
+        local blocked = false
 
         -- check bounds for push
-        if not self.map:getTileAt(pushX, pushY) then
-            moved = false
-        elseif not self.map:isEmpty(pushX, pushY, {dx, dy}) then
-            moved = false
-        else
-            -- check for another box in the push spot
-            local blocked = false
-            for _, b in ipairs(self.map.boxes) do
-                if b.x == pushX and b.y == pushY then blocked = true end
+        if not self.map.grid[pushY] or not self.map.grid[pushY][pushX] then
+            blocked = true
+        end
+
+        -- check tile at push
+        local pushTile = self.map.grid[pushY] and self.map.grid[pushY][pushX]
+        if pushTile then
+            local tileDef = config.tiles[pushTile]
+            if not self.map:isEmpty(pushX, pushY, {dx, dy}) then
+                blocked = true
             end
 
-            if not blocked then
-                if dx > 0 then 
-                    self.tilesetQuad = tilesetQuad(4,0)
-                elseif dx < 0 then
-                    self.tilesetQuad = tilesetQuad(4,1)
-                elseif dy > 0 then
-                    self.tilesetQuad = tilesetQuad(1,4)
-                elseif dy < 0 then
-                    self.tilesetQuad = tilesetQuad(2,4)
-                end               
-                -- normal push works
-                self.map:moveBox(boxAtTarget, {dx, dy})
-                if not boxAtTarget.hitSolid then
-                    self.x = targetX
-                    self.y = targetY
-                    moved = true
-                end
-            else             
-                -- swap-push
-                local backX, backY = self.x - dx, self.y - dy
+        end
 
-                -- check if back position exists and is empty
-                local backTile = self.map:getTileAt(backX, backY)
-                if backTile and backTile ~= -1 then
-                    if self.map:isEmpty(backX, backY, {-dx, -dy}) then
-                        local backBlocked = false
-                        for _, b in ipairs(self.map.boxes) do
-                            if b.x == backX and b.y == backY then backBlocked = true end
-                        end
+        -- check for another box in the push spot
+        for _, b in ipairs(self.map.boxes) do
+            if b.x == pushX and b.y == pushY then blocked = true end
+        end
 
-                        if not backBlocked then
-                            self.map:moveBox(boxAtTarget, {-dx, -dy})
-                            self.x = targetX
-                            self.y = targetY
-                            moved = true
-                        end
-                    end
-                end
+        if not blocked then
+            -- normal push works
+            self.map:moveBox(boxAtTarget, {dx, dy})
+            if not boxAtTarget.hitSolid then
+                self.x = targetX
+                self.y = targetY
+                moved = true
+            end
+        else
+            -- swap-push (push box backwards if possible)
+            local backX, backY = self.x, self.y
+            local backBlocked = false
+
+            -- check bounds for back
+            if not self.map.grid[backY] or not self.map.grid[backY][backX] then
+                backBlocked = true
+            end
+
+            -- check tile behind
+            local backTile = self.map.grid[backY] and self.map.grid[backY][backX]
+            if backTile then
+                local tileDef = config.tiles[backTile]
+                if not self.map:isEmpty(backX, backY, {-dx, -dy}) then backBlocked = true end
+            end
+
+            -- check for box behind
+            for _, b in ipairs(self.map.boxes) do
+                if b.x == backX and b.y == backY then backBlocked = true end
+            end
+
+            if not backBlocked then
+                self.map:moveBox(boxAtTarget, {-dx, -dy})
+                self.x = targetX
+                self.y = targetY
+                moved = true
             end
         end
     end
@@ -250,16 +244,15 @@ function player:keypressed(key)
         self.moves = self.moves + 1
 
         -- trigger tile logic
-        local tileDef = config.tiles[self.map:getTileAt(self.x, self.y)]
+        local tileDef = config.tiles[self.map.grid[self.y][self.x]]
         if tileDef and tileDef.on_col then
-            tileDef.on_col(tileDef, self.map)
+            tileDef.on_col()
         end
-
 
         -- check win
         local allOnGoal = true
         for _, box in ipairs(self.map.boxes) do
-            if self.map:getTileAt(box.x, box.y) ~= 2 then
+            if self.map.grid[box.y][box.x] ~= 2 then
                 allOnGoal = false
                 break
             end
@@ -285,17 +278,6 @@ function player:calculateBadge()
     else
         self.badge = "bronze"
     end
-    for _, grid in pairs({self.map.grid_back, self.map.grid_mid, self.map.grid_front}) do
-        if grid then
-            for y,row in ipairs(grid) do
-                for x,tileId in ipairs(row) do
-                    local def = config.tiles[tileId]
-                    if def and def.badge_change then def.badge_change(self.badge) end
-                end
-            end
-        end
-    end
-
 end
 
 return player
