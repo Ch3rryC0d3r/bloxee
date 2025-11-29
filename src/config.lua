@@ -2,16 +2,14 @@ local config = {}
 
 config.tilesets = {
     default = "assets/tileset_1.png",
-    -- modders can add: custom = "mods/my_tileset.png"
+    unused = "assets/tileset_2.png",
 }
 
--- Format: [id] = { tileset_pos = {x,y}, tileset = "default", solid = bool, on_col = function }
 config.tiles = {
     [0] = { tileset_pos = {0,0}, tileset = "default", solid = true, name = "bricks" },
     [1] = { tileset_pos = {1,0}, tileset = "default", solid = false, name = "box_1" },
     [2] = { tileset_pos = {2,0}, tileset = "default", solid = false, name = "goal" },
     [7] = { tileset_pos = {0,1}, tileset = "default", solid = false, name = "floor" },
-    [9] = { tileset_pos = {2,1}, tileset = "default", solid = false, name = "spawn" },
     [6] = { tileset_pos = {1,1}, tileset = "default", solid = false, name = "box_2" },
     -- colored bricks --
     [24] = { tileset_pos = {3,3}, tileset = "default", solid = true, name = "purple_bricks" },
@@ -61,13 +59,19 @@ config.levels = {
 
 -- BADGE THRESHOLDS (platinum moves per level)
 config.badges = {
-    [1] = 21,
+    [1] = 21, -- for level 1
+    [2] = 36,
+    [3] = 55, -- for level 3
+    [4] = 73,
+    [5] = 84,
+    [6] = 101,
+    [7] = 94,
 }
 
 -- UI SETTINGS
 config.ui = {
-    screenWidth = 850,
-    screenHeight = 450,
+    screenWidth = 800,
+    screenHeight = 720,
     tileSize = 32,
     fonts = {
         title = 48,

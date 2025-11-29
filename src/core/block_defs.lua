@@ -11,6 +11,7 @@ end
 
 blocks.ice = {
     solid = false,
+    csv_id = 15,
     tileset = "default",
     pos = { x = 1, y = 2 },
 
@@ -31,8 +32,16 @@ blocks.ice = {
     end,
 }
 
+blocks.spawn = { 
+    csv_id = 9,
+    pos = { x = 2 , y = 1 }, 
+    tileset = "default", 
+    solid = false,  
+}
+
 blocks.no_box = {
     solid = false,
+    csv_id = 16,
     boxSolid = true,
     tileset = "default",
     pos = { x = 2, y = 2 },
@@ -41,11 +50,13 @@ blocks.no_box = {
 blocks.only_up = {
     solid = {up=false, down=true, right=true, left=true},
     tileset = "default",
+    csv_id = 22,
     pos = { x = 1, y = 3 },
 }
 
 blocks.only_down = {
     solid = {up=true, down=false, right=true, left=true},
+    csv_id = 21,
     tileset = "default",
     pos = { x = 0, y = 3 },
 }
@@ -53,17 +64,20 @@ blocks.only_down = {
 blocks.only_left = {
     solid = {up=true, down=true, right=true, left=false},
     tileset = "default",
+    csv_id = 23,
     pos = { x = 2, y = 3 },
 }
 
 blocks.only_right = {
     solid = {up=true, down=true, right=false, left=true},
     tileset = "default",
+    csv_id = 28,
     pos = { x = 0, y = 4 },
 }
 
 blocks.button = {
     solid = false,
+    tileset = "unused",
     pos = {x=0, y=8},
     csv_id = 57,
     on_col = function(self, map)
@@ -76,7 +90,7 @@ blocks.button = {
 blocks.door_up = {
     solid = true,
     boxSolid = true,
-    tileset = "default",
+    tileset = "unused",
     csv_id = 72,
     pos = {x=1, y=10},
     activate = function(self, map)
@@ -87,7 +101,7 @@ blocks.door_up = {
 blocks.door_left = {
     solid = false,
     boxSolid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=0, y=9},
     csv_id = 64,
     activate = function(self, map)
@@ -98,7 +112,7 @@ blocks.door_left = {
 blocks.door_right = {
     solid = true,
     boxSolid = true,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=1, y=9},
     activate = function(self, map)
         map.grid_front[self.y][self.x] = (0+(10*7))+1
@@ -108,7 +122,7 @@ blocks.door_right = {
 blocks.door_down = {
     solid = false,
     boxSolid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=0, y=10},
     activate = function(self, map)
         map.grid_front[self.y][self.x] = (1+(9*7))+1
@@ -118,134 +132,134 @@ blocks.door_down = {
 
 blocks.wire_001 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=0, y=7},
     wire = {up=false, down=true, left=false, right=true}
 }
 blocks.wire_002 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=1, y=7},
     wire = {up=false, down=true, left=true, right=false}
 }
 blocks.wire_003 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=2, y=7},
     wire = {up=true, down=false, left=false, right=true}
 }
 blocks.wire_004 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=3, y=7},
     wire = {up=false, down=false, left=true, right=true}
 }
 blocks.wire_005 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=4, y=7},
     wire = {up=true, down=false, left=true, right=false}
 }
 blocks.wire_006 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=5, y=7},
     wire = {up=true, down=true, left=false, right=false}
 }
 blocks.wire_007 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=6, y=7},
     wire = {up=true, down=true, left=false, right=true}
 }
 blocks.wire_008 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=2, y=8},
     wire = {up=true, down=false, left=false, right=true}
 }
 blocks.wire_009 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=3, y=8},
     wire = {up=false, down=false, left=true, right=true}
 }
 blocks.wire_010 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=4, y=8},
     wire = {up=true, down=false, left=true, right=false}
 }
 blocks.wire_011 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=5, y=8},
     wire = {up=false, down=true, left=true, right=true}
 }
 blocks.wire_012 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=6, y=8},
     wire = {up=true, down=true, left=true, right=false}
 }
 blocks.wire_013 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=2, y=9},
     wire = {up=false, down=true, left=false, right=true}
 }
 blocks.wire_014 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=3, y=9},
     wire = {up=false, down=false, left=true, right=true}
 }
 blocks.wire_015 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=4, y=9},
     wire = {up=false, down=true, left=true, right=false}
 }
 blocks.wire_016 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=5, y=9},
     wire = {up=true, down=false, left=true, right=true}
 }
 blocks.wire_017 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=2, y=6},
     wire = {up=false, down=true, left=false, right=true}
 }
 blocks.wire_018 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=3, y=6},
     wire = {up=false, down=false, left=true, right=true}
 }
 blocks.wire_019 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=4, y=6},
     wire = {up=false, down=true, left=true, right=false}
 }
 blocks.wire_020 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=5, y=6},
     wire = {up=false, down=false, left=true, right=true}
 }
 blocks.wire_021 = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=6, y=6},
     wire = {up=true, down=true, left=true, right=true}
 }
 
 blocks.activate_trigger = {
     solid = false,
-    tileset = "default",
+    tileset = "unused",
     pos = {x=1, y=8},
     on_signal = function(self, x, y, map)
         -- check tile below in front layer and call activate
@@ -262,9 +276,10 @@ blocks.activate_trigger = {
 blocks.collectible = {
     solid = false,
     tileset = "default",
-    pos = {x=6, y=0}, -- choose a free spot in your tileset
-    csv_id = 50,      -- make sure this isn't used yet
+    pos = {x=1, y=11},
+    csv_id = 78,
     on_col = function()
+        --print('collided with collectible')
         BLOX.PLR.collectibles = (BLOX.PLR.collectibles or 0) + 1
         -- remove the collectible from the map after grabbing
         local x, y = BLOX.PLR.x, BLOX.PLR.y
@@ -272,7 +287,7 @@ blocks.collectible = {
     end
 }
 
-for _, block in pairs(blocks) do validateBlock(block) end
+--for _, block in pairs(blocks) do validateBlock(block) end
 for name, block in pairs(blocks) do
     if block.pos and not block.csv_id then
         block.csv_id = (block.pos.x + (block.pos.y * 7)) + 1

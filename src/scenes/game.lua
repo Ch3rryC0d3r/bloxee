@@ -9,7 +9,7 @@ game.camX = 0
 game.camY = 0
 
 local paused = false
-local pauseOptions = {"Resume", "Reset Level", "Quit Level"}
+local pauseOptions = {"Resume", "Reset Level", "Quit to Menu", "Quit to Levels"}
 local selectedPause = 1
 local font = love.graphics.newFont(32)
 local titleFont = love.graphics.newFont(48)
@@ -45,7 +45,7 @@ function game:update(dt)
         local camStepX = math.floor(config.ui.screenWidth / tileSize) * tileSize
         local camStepY = math.floor(config.ui.screenHeight / tileSize) * tileSize
 
-        -- calculate which “camera block” player is in
+        -- calculate which "camera block" player is in
         local playerPixelX = (self.player.x - 1) * tileSize
         local playerPixelY = (self.player.y - 1) * tileSize
 
@@ -83,7 +83,6 @@ function game:draw()
         end
     end
 
-    -- You Win screen
     if self.player.hasWon then
         love.graphics.setColor(0,0,0,0.7)
         love.graphics.rectangle("fill",0,0,640,480)
@@ -92,8 +91,20 @@ function game:draw()
         love.graphics.printf("You Win!",0,50,640,"center")
         love.graphics.setFont(font)
         
+        -- Collectibles counter
+        love.graphics.setColor(0.6, 0.6, 0.6)
+        local got = BLOX.PLR.collectibles
+        local total = BLOX.PLR.total_collectibles
+        if total > 0 then 
+            love.graphics.printf(got .. "/" .. total .. " Strawbs Collected", 0, 250, 640, "center")
+        end
+
+        -- Moves
         local movesText = "Moves: "..self.player.moves
-        love.graphics.printf(movesText,0,150,640,"center")
+        love.graphics.printf(movesText,0,160,640,"center")
+        love.graphics.setColor(0.4, 0.4, 0.4)
+        local movesText = "(Plat. Moves): ".. self.player.plat_moves
+        love.graphics.printf(movesText,0,240,640,"center")        
         
         -- draw badge next to moves
         local badgeIdx = ({platinum=1,gold=2,silver=3,bronze=4})[self.player.badge] or 0
@@ -109,7 +120,7 @@ function game:draw()
             love.graphics.setColor(0.6, 0.6, 0.6)
             love.graphics.setFont(love.graphics.newFont(16))
             local badgeLabel = self.player.badge:sub(1,1):upper()..self.player.badge:sub(2)
-            love.graphics.printf(badgeLabel, badgeX-10, badgeY+68, 120, "center")
+            love.graphics.printf(badgeLabel, badgeX-25, badgeY+68, 120, "center")
         end
         
         -- timer
@@ -125,6 +136,7 @@ function game:draw()
             love.graphics.printf(opt,0,y,640,"center")
         end
     end
+
     
     love.graphics.setColor(1,1,1)
 end
@@ -184,6 +196,10 @@ function game:keypressed(key)
                 local menu = require "src.scenes.menu"
                 menu:load()
                 currentScene = menu
+            elseif selectedPause == 4 then 
+                local levelselect = require "src.scenes.levelselect"
+                levelselect:load()
+                currentScene = levelselect                
             end
         end
     else

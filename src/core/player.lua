@@ -10,9 +10,12 @@ BLOX = {
 BLOX.BOXES = {}
 player.x = 1
 player.y = 1
+player.collectibles = 0
+player.total_collectibles = 0
 player.tilesetQuad = nil
 TILE_SIZE = config.ui.tileSize
 player.moves = 0
+player.plat_moves = 0
 player.hasWon = false
 player.badge = nil
 player.canMove = true
@@ -38,9 +41,10 @@ function updateTimers(dt)
     end
 end
 
-
 function player:load(map, level)
     self.map = map
+    self.collectibles = 0
+    self.total_collectibles = self.map:countCollectibles()
     self.level = level
     self.moves = 0
     self.hasWon = false
@@ -266,6 +270,7 @@ end
 
 function player:calculateBadge()
     local platinum = config.badges[self.level] or 10
+    self.plat_moves = platinum
     local gold = math.ceil(platinum * 1.12)
     local silver = math.ceil(platinum * 1.25)
 

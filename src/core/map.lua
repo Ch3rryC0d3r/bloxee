@@ -84,6 +84,18 @@ function map:buildQuads(tileset)
     return quads
 end
 
+function map:countCollectibles()
+    local count = 0
+    for y,row in ipairs(self.grid) do
+        for x,tile in ipairs(row) do
+            if tile == 79 then
+                count = count + 1
+            end
+        end
+    end
+    return count
+end
+
 function map:load(level)
     -- normal level
     local path = "levels/" .. level .. ".csv"
@@ -129,14 +141,17 @@ function map:load(level)
 
         for x, cell in ipairs(cells) do
             local num = tonumber(cell)
-            if num == 9 then
+            if num > -1 then 
+                print(num)
+            end
+            if num == 9 or num == 10 then
                 self.playerSpawn = {x=x, y=y}
-                num = 7
+                num = -1
             end
             if num == 1 then
                 local box = {x=x, y=y, map=self}
                 table.insert(self.boxes, box)
-                num = 7
+                num = -1
             end
 
             self.grid[y][x] = num
